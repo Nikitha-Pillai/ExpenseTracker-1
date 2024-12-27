@@ -1,4 +1,6 @@
+
 import 'package:expense_tracker_1/exp.dart';
+import 'package:expense_tracker_1/homepage.dart';
 import 'package:flutter/material.dart';
 // Example path
 
@@ -108,9 +110,14 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: (){
-          Navigator.push(context, MaterialPageRoute(builder: (context)=>const ExpenseTrackerScreen()));
-        },
+
+       
+
+        onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => const ExpenseTrackerApp()));
+                },
+
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.

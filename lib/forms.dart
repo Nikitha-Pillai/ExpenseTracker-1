@@ -19,30 +19,33 @@ class FormsState extends State<Forms> {
         title: const Text('Expense Tracker'),
         backgroundColor: Colors.blueGrey,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [ 
-          _buildBudgetCard('Food',Colors.redAccent,foodController),
-          const SizedBox(height: 20),
-          _buildBudgetCard('Transport',Colors.blue,transportController),
-          const SizedBox(height: 20),
-          _buildBudgetCard('Entertainment',Colors.green,entertainmentController),
-          const Spacer(),
-          ElevatedButton.icon(onPressed: (){
-            print('Add budget pressed');
-          },
-          icon: const Icon(Icons.add),
-          label: const Text('Add Budget'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blueGrey,
-            padding: const EdgeInsets.symmetric(vertical: 20),
-        ),
-        
+      body: Container(
+        color: Colors.black,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [ 
+            _buildBudgetCard('Food',Colors.redAccent,foodController),
+            const SizedBox(height: 20),
+            _buildBudgetCard('Transport',Colors.blue,transportController),
+            const SizedBox(height: 20),
+            _buildBudgetCard('Entertainment',Colors.green,entertainmentController),
+            const Spacer(),
+            ElevatedButton.icon(onPressed: (){
+              print('Add budget pressed');
+            },
+            icon: const Icon(Icons.add),
+            label: const Text('Add Budget'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blueGrey,
+              padding: const EdgeInsets.symmetric(vertical: 20),
           ),
-        ],
-        ),),
+          
+            ),
+          ],
+          ),),
+      ),
     );
   }
 

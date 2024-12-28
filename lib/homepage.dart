@@ -1,4 +1,4 @@
-//import 'package:expense_tracker_1/exp.dart';
+import 'package:expense_tracker_1/exp.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
@@ -39,7 +39,7 @@ class _HomePageWithNavbarState extends State<HomePageWithNavbar> {
 
   final List<Widget> _pages = [
     const HomePage(),
-    //const ExpenseTrackerScreen(),
+    const ExpenseTrackerScreen(),
   ];
 
   @override

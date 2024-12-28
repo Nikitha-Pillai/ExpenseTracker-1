@@ -15,9 +15,9 @@ class MyPage extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(15.0),
           child: Table(
-            border: TableBorder.symmetric(
-              inside: const BorderSide(color: Colors.grey, width: 0.5),
-              outside: const BorderSide(color: Colors.white, width: 1.0),
+            border: const TableBorder.symmetric(
+              inside: BorderSide(color: Colors.grey, width: 0.5),
+              outside: BorderSide(color: Colors.white, width: 1.0),
             ),
             columnWidths: const {
               0: FlexColumnWidth(3),

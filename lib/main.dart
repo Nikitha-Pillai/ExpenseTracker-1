@@ -1,8 +1,6 @@
-
-//import 'package:expense_tracker_1/exp.dart';
 import 'package:expense_tracker_1/homepage.dart';
 import 'package:flutter/material.dart';
-import 'page.dart';
+
 
 void main() {
   runApp(const MyApp());

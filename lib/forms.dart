@@ -38,7 +38,7 @@ class FormsState extends State<Forms> {
             icon: const Icon(Icons.add),
             label: const Text('Add Budget'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blueGrey,
+              backgroundColor: Colors.black,
               padding: const EdgeInsets.symmetric(vertical: 20),
           ),
           
@@ -84,7 +84,7 @@ return Center(
                 print('$title budget saved: ${controller.text}');
               }, 
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueGrey,
+                backgroundColor: Colors.black,
                 padding: const EdgeInsets.symmetric(horizontal: 20),
               ),
               child: const Text('Save'),
@@ -93,7 +93,7 @@ return Center(
                 print('$title budget updated: ${controller.text}');
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueGrey,
+                backgroundColor: Colors.black,
                 padding: const EdgeInsets.symmetric(horizontal: 20),
               ),
                child: const Text('Update'),

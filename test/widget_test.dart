@@ -7,7 +7,6 @@
 
 
 
-import 'package:expense_tracker_1/main.dart';
 //import 'package:expense_tracker_1/exp.dart';
 
 import 'package:expense_tracker_1/homepage.dart';

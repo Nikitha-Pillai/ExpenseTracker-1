@@ -1,5 +1,6 @@
 import 'package:expense_tracker_1/exp.dart';
 import 'package:expense_tracker_1/forms.dart';
+import 'package:expense_tracker_1/main.dart';
 import 'package:expense_tracker_1/page.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -18,9 +19,9 @@ class ExpenseTrackerApp extends StatelessWidget {
     return MaterialApp(
       title: 'Expense Tracker',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 68, 66, 66),
-        ),
+        //colorScheme: ColorScheme.fromSeed(
+        //  seedColor:const Color.fromARGB(255, 79, 78, 78)
+        //),
         useMaterial3: true,
       ),
       home: const HomePageWithNavbar(),
@@ -84,13 +85,15 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 79, 78, 78),
-        title: const Text('Expense Tracker'),
+        title: const Text('Expense Tracker',style: TextStyle(color: Colors.white),),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 50.0),
             child: IconButton(
               icon: const Icon(Icons.person, color: Colors.black),
-              onPressed: () {},
+              onPressed: () { Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => const MyApp()));
+                },
             ),
           ),
         ],

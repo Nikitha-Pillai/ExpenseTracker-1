@@ -1,3 +1,4 @@
+import 'package:expense_tracker_1/main.dart';
 import 'package:flutter/material.dart';
 
 class Forms extends StatefulWidget {
@@ -16,8 +17,19 @@ class FormsState extends State<Forms> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Expense Tracker'),
-        backgroundColor: Colors.blueGrey,
+        backgroundColor: const Color.fromARGB(255, 79, 78, 78),
+        title: const Text('Expense Tracker',style: TextStyle(color: Colors.white),),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 50.0),
+            child: IconButton(
+              icon: const Icon(Icons.person, color: Colors.black),
+              onPressed: () { Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => const MyApp()));
+                },
+            ),
+          ),
+        ],
       ),
       body: Container(
         color: Colors.black,
@@ -26,85 +38,108 @@ class FormsState extends State<Forms> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [ 
-            _buildBudgetCard('Food',Colors.redAccent,foodController),
+            _buildBudgetCard('Food',const Color.fromARGB(255, 177, 32, 32),foodController,),
             const SizedBox(height: 20),
-            _buildBudgetCard('Transport',Colors.blue,transportController),
+            _buildBudgetCard('Transport',const Color.fromARGB(255, 22, 43, 129),transportController),
             const SizedBox(height: 20),
-            _buildBudgetCard('Entertainment',Colors.green,entertainmentController),
+            _buildBudgetCard('Entertainment',const Color.fromARGB(255, 38, 147, 41),entertainmentController),
             const Spacer(),
-            ElevatedButton.icon(onPressed: (){
-              print('Add budget pressed');
-            },
-            icon: const Icon(Icons.add),
-            label: const Text('Add Budget'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
-              padding: const EdgeInsets.symmetric(vertical: 20),
+            SizedBox(height: 2.5),
+           SizedBox(
+  width: MediaQuery.of(context).size.width * 0.2, // 80% of screen width
+  child: ElevatedButton.icon(
+  onPressed: () {
+    // print('Add budget pressed');
+  },
+  icon: const Icon(Icons.add, color: Colors.white),
+  label: const Text(
+    'Add Budget',
+    style: TextStyle(color: Colors.white),
+  ),
+  style: ElevatedButton.styleFrom(
+    backgroundColor: Colors.black,
+    padding: const EdgeInsets.symmetric(vertical: 20),
+    side: const BorderSide(color: Colors.white, width: 2), // White border
+  ),
+),
           ),
-          
-            ),
           ],
           ),),
       ),
     );
   }
 
-Widget _buildBudgetCard(String title,Color color, TextEditingController controller){
-return Center(
-  child: Container(
-    width: MediaQuery.of(context).size.width * 0.8,
-    
-    padding: const EdgeInsets.all(16),
-    decoration:BoxDecoration(
-      color: color,
-      borderRadius: BorderRadius.circular(8),
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        
-        Text(
-          title,
-          style: const TextStyle(fontSize: 18,fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 8),
-        TextField(
-          controller: controller,
-          decoration: const InputDecoration(
-            labelText: 'Enter your budget',
-            border: OutlineInputBorder(),
+Widget _buildBudgetCard(String title, Color color, TextEditingController controller) {
+  return Center(
+    child: Container(
+      width: MediaQuery.of(context).size.width * 0.8,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
           ),
-          keyboardType: TextInputType.number,
-           ),
-           const SizedBox(height: 16),
-           Row(
+          const SizedBox(height: 8),
+          TextField(
+            controller: controller,
+            style: const TextStyle(color: Colors.white), // Set text color
+            decoration: InputDecoration(
+              labelText: 'Enter your budget',
+              labelStyle: const TextStyle(color: Colors.white), // Set label color
+              border: OutlineInputBorder(
+                borderSide: const BorderSide(color: Colors.white), // Set border color
+              ),
+              enabledBorder: const OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.white), // Border when enabled
+              ),
+              focusedBorder: const OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.white, width: 2), // Border when focused
+              ),
+            ),
+            keyboardType: TextInputType.number,
+          ),
+          const SizedBox(height: 16),
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              ElevatedButton(onPressed: (){
-                print('$title budget saved: ${controller.text}');
-              }, 
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+              ElevatedButton(
+                onPressed: () {
+                  // print('$title budget saved: ${controller.text}');
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                ),
+                child: const Text(
+                  'Save',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
-              child: const Text('Save'),
+              ElevatedButton(
+                onPressed: () {
+                  // print('$title budget updated: ${controller.text}');
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                ),
+                child: const Text(
+                  'Update',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
-              ElevatedButton(onPressed: (){
-                print('$title budget updated: ${controller.text}');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-              ),
-               child: const Text('Update'),
-               ),
             ],
-           )
-      ],
+          )
+        ],
+      ),
     ),
-  ),
-);
-
+  );
 }
 
  @override

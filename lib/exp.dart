@@ -1,21 +1,6 @@
 import 'dart:collection';
+import 'package:expense_tracker_1/main.dart';
 import 'package:flutter/material.dart';
-
-void main() {
-  runApp(const ExpenseTrackerApp());
-}
-
-class ExpenseTrackerApp extends StatelessWidget {
-  const ExpenseTrackerApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: 'Expense Tracker',
-      home: ExpenseTrackerScreen(),
-    );
-  }
-}
 
 class ExpenseTrackerScreen extends StatefulWidget {
   const ExpenseTrackerScreen({super.key});
@@ -66,15 +51,15 @@ class ExpenseTrackerScreenState extends State<ExpenseTrackerScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 79, 78, 78),
-        title: const Text('Expense Tracker'),
+        title: const Text('Expense Tracker',style: TextStyle(color: Colors.white),),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 50.0),
             child: IconButton(
               icon: const Icon(Icons.person, color: Colors.black),
-              onPressed: () {
-                // Add profile navigation logic here
-              },
+              onPressed: () { Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => const MyApp()));
+                },
             ),
           ),
         ],

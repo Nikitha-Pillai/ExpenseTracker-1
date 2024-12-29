@@ -1,3 +1,4 @@
+import 'package:expense_tracker_1/main.dart';
 import 'package:flutter/material.dart';
 
 class MyPage extends StatelessWidget {
@@ -7,8 +8,19 @@ class MyPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Expense Table'),
-        backgroundColor: Colors.grey,
+        backgroundColor: const Color.fromARGB(255, 79, 78, 78),
+        title: const Text('Expense Tracker',style: TextStyle(color: Colors.white),),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 50.0),
+            child: IconButton(
+              icon: const Icon(Icons.person, color: Colors.black),
+              onPressed: () { Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => const MyApp()));
+                },
+            ),
+          ),
+        ],
       ),
       backgroundColor: Colors.black, // Set the background color to black
       body: SingleChildScrollView(
@@ -30,7 +42,7 @@ class MyPage extends StatelessWidget {
               // Fixed Expenses Section
               TableRow(
                 decoration: BoxDecoration(
-                  color: Colors.yellow.shade700, // Yellow background for "Fixed Expenses"
+                  color: const Color.fromARGB(255, 251, 155, 45), // Yellow background for "Fixed Expenses"
                 ),
                 children: const [
                   TableCell(

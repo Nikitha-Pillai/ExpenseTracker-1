@@ -14,6 +14,7 @@ class ExpenseTrackerScreenState extends State<ExpenseTrackerScreen> {
   final TextEditingController categoryController = TextEditingController();
   TextEditingController dateController = TextEditingController();
   TextEditingController timeController = TextEditingController();
+  bool isIncome = false; // Default: Expense
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -43,7 +44,9 @@ class ExpenseTrackerScreenState extends State<ExpenseTrackerScreen> {
   }
 
   void _addExpense() {
-    
+    // Add your transaction handling logic here
+   // final transactionType = isIncome ? 'Income' : 'Expense';
+    //print('Transaction added as $transactionType');
   }
 
   @override
@@ -51,15 +54,19 @@ class ExpenseTrackerScreenState extends State<ExpenseTrackerScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 79, 78, 78),
-        title: const Text('Expense Tracker',style: TextStyle(color: Colors.white),),
+        title: const Text(
+          'Expense Tracker',
+          style: TextStyle(color: Colors.white),
+        ),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 50.0),
             child: IconButton(
               icon: const Icon(Icons.person, color: Colors.black),
-              onPressed: () { Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => const MyApp()));
-                },
+              onPressed: () {
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (context) => const MyApp()));
+              },
             ),
           ),
         ],
@@ -73,13 +80,35 @@ class ExpenseTrackerScreenState extends State<ExpenseTrackerScreen> {
             children: [
               const Center(
                 child: Text(
-                  'Amount Spent',
+                  'Enter the Transaction',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
                 ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Expense',
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                  Switch(
+                    value: isIncome,
+                    onChanged: (bool value) {
+                      setState(() {
+                        isIncome = value;
+                      });
+                    },
+                  ),
+                  const Text(
+                    'Income',
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                ],
               ),
               const SizedBox(height: 30),
               const TextField(
@@ -110,11 +139,11 @@ class ExpenseTrackerScreenState extends State<ExpenseTrackerScreen> {
                   suffixIcon: IconButton(
                     icon: const Icon(Icons.calendar_today),
                     color: Colors.white,
-                    onPressed: () => _selectDate(context), // Date picker appears immediately
+                    onPressed: () => _selectDate(context),
                   ),
                 ),
-                readOnly: true, // Make field read-only, so the date picker triggers
-                onTap: () => _selectDate(context), // Trigger date picker when field is tapped
+                readOnly: true,
+                onTap: () => _selectDate(context),
               ),
               const SizedBox(height: 8),
               TextField(
@@ -131,17 +160,17 @@ class ExpenseTrackerScreenState extends State<ExpenseTrackerScreen> {
                   suffixIcon: IconButton(
                     icon: const Icon(Icons.access_time),
                     color: Colors.white,
-                    onPressed: () => _selectTime(context), // Time picker appears immediately
+                    onPressed: () => _selectTime(context),
                   ),
                 ),
-                readOnly: true, // Make field read-only, so the time picker triggers
-                onTap: () => _selectTime(context), // Trigger time picker when field is tapped
+                readOnly: true,
+                onTap: () => _selectTime(context),
               ),
               const SizedBox(height: 8),
               const TextField(
                 style: TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                  labelText: 'Paid To',
+                  labelText: 'Transaction Details',
                   labelStyle: TextStyle(color: Colors.white),
                   hintStyle: TextStyle(color: Colors.white),
                   border: OutlineInputBorder(),
@@ -154,7 +183,7 @@ class ExpenseTrackerScreenState extends State<ExpenseTrackerScreen> {
               Row(
                 children: [
                   const SizedBox(width: 8),
-                  DropdownButton<IconLabel>( 
+                  DropdownButton<IconLabel>(
                     value: selectedCategory,
                     hint: const Text(
                       'Select Category',
@@ -162,7 +191,7 @@ class ExpenseTrackerScreenState extends State<ExpenseTrackerScreen> {
                     ),
                     items: IconLabel.entries
                         .map(
-                          (entry) => DropdownMenuItem<IconLabel>( 
+                          (entry) => DropdownMenuItem<IconLabel>(
                             value: entry.value,
                             child: Row(
                               children: [
@@ -197,11 +226,15 @@ class ExpenseTrackerScreenState extends State<ExpenseTrackerScreen> {
                 child: ElevatedButton(
                   onPressed: _addExpense,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 37, 37, 37), // Button color
-                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                    backgroundColor: const Color.fromARGB(255, 37, 37, 37),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                     textStyle: const TextStyle(fontSize: 18),
                   ),
-                  child: const Text('Add the Expense',style: TextStyle(color: Colors.white),),
+                  child: const Text(
+                    'Add the Transaction',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
             ],

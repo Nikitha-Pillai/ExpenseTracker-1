@@ -44,7 +44,7 @@ class FormsState extends State<Forms> {
             const SizedBox(height: 20),
             _buildBudgetCard('Entertainment',const Color.fromARGB(255, 38, 147, 41),entertainmentController),
             const Spacer(),
-            SizedBox(height: 2.5),
+            const SizedBox(height: 2.5),
            SizedBox(
   width: MediaQuery.of(context).size.width * 0.2, // 80% of screen width
   child: ElevatedButton.icon(
@@ -89,16 +89,16 @@ Widget _buildBudgetCard(String title, Color color, TextEditingController control
           TextField(
             controller: controller,
             style: const TextStyle(color: Colors.white), // Set text color
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               labelText: 'Enter your budget',
-              labelStyle: const TextStyle(color: Colors.white), // Set label color
+              labelStyle: TextStyle(color: Colors.white), // Set label color
               border: OutlineInputBorder(
-                borderSide: const BorderSide(color: Colors.white), // Set border color
+                borderSide: BorderSide(color: Colors.white), // Set border color
               ),
-              enabledBorder: const OutlineInputBorder(
+              enabledBorder: OutlineInputBorder(
                 borderSide: BorderSide(color: Colors.white), // Border when enabled
               ),
-              focusedBorder: const OutlineInputBorder(
+              focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(color: Colors.white, width: 2), // Border when focused
               ),
             ),

@@ -11,11 +11,13 @@ class ExpenseTrackerScreen extends StatefulWidget {
 }
 
 class ExpenseTrackerScreenState extends State<ExpenseTrackerScreen> {
+   final TextEditingController amountController = TextEditingController();
+  final TextEditingController detailsController = TextEditingController();
+  final TextEditingController dateController = TextEditingController();
+  final TextEditingController timeController = TextEditingController();
+
   IconLabel? selectedCategory;
-  final TextEditingController categoryController = TextEditingController();
-  TextEditingController dateController = TextEditingController();
-  TextEditingController timeController = TextEditingController();
-  bool isIncome = false; // Default: Expense
+  bool isIncome = false;
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -45,13 +47,41 @@ class ExpenseTrackerScreenState extends State<ExpenseTrackerScreen> {
   }
 
   Future<void> addExpense() async {
-   try{
-    FirebaseFirestore.instance.collection("transactions").add({});
+  try {
+    await FirebaseFirestore.instance.collection("transactions").add({
+      'Amount': int.parse(amountController.text), // Parse amount if numeric
+      'Date': dateController.text,
+      'Time': timeController.text,
+      'Transaction Details': detailsController.text,
+      'Category': selectedCategory?.label ?? 'Others', // Use selected category
+      'Transaction Type': isIncome ? 'Income' : 'Expense',
+    });
 
-   }catch(e){
+    // Clear the text fields and reset state
+    setState(() {
+      amountController.clear();
+      dateController.clear();
+      timeController.clear();
+      detailsController.clear();
+      selectedCategory = null;
+      isIncome = false;
+    });
+
+    // Optionally show a success message
+    // ignore: use_build_context_synchronously
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Transaction added successfully')),
+    );
+  } catch (e) {
+    // ignore: avoid_print
     print(e);
-   }
+    // ignore: use_build_context_synchronously
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Failed to add transaction: $e')),
+    );
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -115,10 +145,11 @@ class ExpenseTrackerScreenState extends State<ExpenseTrackerScreen> {
                 ],
               ),
               const SizedBox(height: 30),
-              const TextField(
+              TextField(
+                controller: amountController,
                 keyboardType: TextInputType.number,
-                style: TextStyle(color: Colors.white),
-                decoration: InputDecoration(
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
                   labelText: 'Enter Amount',
                   labelStyle: TextStyle(color: Colors.white),
                   hintStyle: TextStyle(color: Colors.white),
@@ -171,9 +202,10 @@ class ExpenseTrackerScreenState extends State<ExpenseTrackerScreen> {
                 onTap: () => _selectTime(context),
               ),
               const SizedBox(height: 8),
-              const TextField(
-                style: TextStyle(color: Colors.white),
-                decoration: InputDecoration(
+              TextField(
+                 controller: detailsController,
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
                   labelText: 'Transaction Details',
                   labelStyle: TextStyle(color: Colors.white),
                   hintStyle: TextStyle(color: Colors.white),
@@ -228,7 +260,7 @@ class ExpenseTrackerScreenState extends State<ExpenseTrackerScreen> {
               const SizedBox(height: 30),
               Center(
                 child: ElevatedButton(
-                  onPressed: addExpense,
+                  onPressed: () async{ await addExpense();},
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 37, 37, 37),
                     padding:

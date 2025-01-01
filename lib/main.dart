@@ -1,7 +1,11 @@
+import 'package:expense_tracker_1/firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:expense_tracker_1/homepage.dart';
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
@@ -45,7 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Heading below AppBar
-              Center(
+              const Center(
                 child: Text(
                   'Track Your Expense Now',
                   style:  TextStyle(color: Colors.white,fontSize: 24)

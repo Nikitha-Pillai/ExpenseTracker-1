@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker_1/main.dart';
 import 'package:flutter/material.dart';
 
@@ -43,10 +44,13 @@ class ExpenseTrackerScreenState extends State<ExpenseTrackerScreen> {
     }
   }
 
-  void _addExpense() {
-    // Add your transaction handling logic here
-   // final transactionType = isIncome ? 'Income' : 'Expense';
-    //print('Transaction added as $transactionType');
+  Future<void> addExpense() async {
+   try{
+    FirebaseFirestore.instance.collection("transactions").add({});
+
+   }catch(e){
+    print(e);
+   }
   }
 
   @override
@@ -224,7 +228,7 @@ class ExpenseTrackerScreenState extends State<ExpenseTrackerScreen> {
               const SizedBox(height: 30),
               Center(
                 child: ElevatedButton(
-                  onPressed: _addExpense,
+                  onPressed: addExpense,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 37, 37, 37),
                     padding:

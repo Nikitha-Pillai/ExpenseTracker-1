@@ -284,9 +284,12 @@ class ExpenseTrackerScreenState extends State<ExpenseTrackerScreen> {
 enum IconLabel {
   food('Food', Icons.food_bank),
   transport('Transport', Icons.directions_bus),
+  entertainment('Entertainment',Icons.movie),
   shopping('Shopping', Icons.shopping_bag),
   health('Health', Icons.local_hospital),
   bills('Bills', Icons.receipt_long),
+  studies('Studies',Icons.book),
+  earnings('Earnings',Icons.money),
   others('Others', Icons.miscellaneous_services);
 
   const IconLabel(this.label, this.icon);

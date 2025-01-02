@@ -16,8 +16,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       title: 'Expense Tracker',
-      //theme: ThemeData.dark(),
-     // themeMode: ThemeMode.dark,
       home: MyHomePage(title: 'Flutter Demo Homepage'),
     );
   }
@@ -99,7 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const ExpenseTrackerApp(),
+              builder: (context) => const HomePageWithNavbar(),
             ),
           );
         },

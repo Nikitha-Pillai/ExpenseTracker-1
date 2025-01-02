@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker_1/exp.dart';
 import 'package:expense_tracker_1/forms.dart';
 import 'package:expense_tracker_1/main.dart';
@@ -5,29 +6,10 @@ import 'package:expense_tracker_1/page.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-//import 'exp.dart';
+ import 'package:intl/intl.dart'; 
 
-void main() {
-  runApp(const ExpenseTrackerApp());
-}
 
-class ExpenseTrackerApp extends StatelessWidget {
-  const ExpenseTrackerApp({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Expense Tracker',
-      theme: ThemeData(
-        //colorScheme: ColorScheme.fromSeed(
-        //  seedColor:const Color.fromARGB(255, 79, 78, 78)
-        //),
-        useMaterial3: true,
-      ),
-      home: const HomePageWithNavbar(),
-    );
-  }
-}
 
 class HomePageWithNavbar extends StatefulWidget {
   const HomePageWithNavbar({super.key});
@@ -76,12 +58,16 @@ class _HomePageWithNavbarState extends State<HomePageWithNavbar> {
     );
   }
 }
+ 
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+  print('Today\'s date: $today'); 
+       
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 79, 78, 78),
@@ -317,96 +303,119 @@ class HomePage extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 // Recent Transactions
-                Card(
-                  elevation: 4,
-                  color: const Color.fromARGB(255, 11, 11, 11),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: [
-                        const Text(
-                          "Recent Transactions",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const Divider(),
-                        const Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                "Date",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                "Transaction Detail",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                "Amount",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Divider(),
-                        SizedBox(
-                          height: 150,
-                          child: ListView.builder(
-                            itemCount: 10,
-                            itemBuilder: (context, index) {
-                              return Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      "2024-12-${index + 1}",
-                                      style:
-                                          const TextStyle(color: Colors.white),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      "Description $index",
-                                      style:
-                                          const TextStyle(color: Colors.white),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      "\$${index * 50}",
-                                      style:
-                                          const TextStyle(color: Colors.white),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
+              // Add this package for date formatting
+
+FutureBuilder(
+  future: FirebaseFirestore.instance
+      .collection("transactions")
+      .where("Date", isEqualTo: today)
+      .get(),
+  builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+    
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+      return const Center(
+        child: Text(
+          "No transactions for today",
+          style: TextStyle(color: Colors.white),
+        ),
+        
+      );
+    }
+
+    final transactions = snapshot.data!.docs;
+
+    return Card(
+      elevation: 4,
+      color: const Color.fromARGB(255, 11, 11, 11),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            const Text(
+              "Recent Transactions",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            const Divider(),
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    "Date",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white),
+                    textAlign: TextAlign.center,
                   ),
                 ),
+                Expanded(
+                  child: Text(
+                    "Transaction Detail",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    "Amount",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
+            const Divider(),
+            SizedBox(
+              height: 150,
+              child: ListView.builder(
+                itemCount: transactions.length,
+                itemBuilder: (context, index) {
+                  final transaction = transactions[index].data() as Map<String, dynamic>;
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          transaction['Date'] ?? 'N/A',
+                          style: const TextStyle(color: Colors.white),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          transaction['Transaction Details'] ?? 'N/A',
+                          style: const TextStyle(color: Colors.white),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          "\$${transaction['Amount'] ?? 0}",
+                          style: const TextStyle(color: Colors.white),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  },
+),
+
+
+
               ],
             ),
           ),

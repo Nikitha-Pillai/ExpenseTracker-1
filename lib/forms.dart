@@ -65,7 +65,7 @@ class FormsState extends State<Forms> {
                 const SizedBox(height: 20),
                 _buildBudgetCard(
                   'Shopping',
-                  const Color.fromARGB(255, 141, 133, 41),
+                  const Color.fromARGB(255, 163, 195, 46),
                   foodController,
                 ),
                 const SizedBox(height: 20),

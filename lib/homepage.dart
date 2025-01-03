@@ -9,15 +9,12 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
  import 'package:intl/intl.dart'; 
 
 
-
-
 class HomePageWithNavbar extends StatefulWidget {
   const HomePageWithNavbar({super.key});
 
   @override
   State<HomePageWithNavbar> createState() => _HomePageWithNavbarState();
 }
-
 class _HomePageWithNavbarState extends State<HomePageWithNavbar> {
   int _currentPage = 0;
   final GlobalKey<CurvedNavigationBarState> _curvedNavigationKey = GlobalKey();
@@ -66,7 +63,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
      final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-  print('Today\'s date: $today'); 
+  //print('Today\'s date: $today'); 
        
     return Scaffold(
       appBar: AppBar(
@@ -121,16 +118,50 @@ class HomePage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Center(
-                      child: Text(
-                        "Total Expense: ₹2000\nTotal Income: ₹5000",
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleLarge
-                            ?.copyWith(color: Colors.white),
-                      ),
-                    ),
+                   FutureBuilder<QuerySnapshot>(
+  future: FirebaseFirestore.instance.collection("transactions").get(),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+      return const Center(
+        child: Text(
+          'No transactions available',
+          style: TextStyle(color: Colors.white),
+        ),
+      );
+    }
+
+    final transactions = snapshot.data!.docs;
+    double totalIncome = 0;
+    double totalExpense = 0;
+
+    for (var doc in transactions) {
+      final data = doc.data() as Map<String, dynamic>;
+      final amount = data['Amount'] ?? 0;
+      final type = data['Transaction Type'] ?? '';
+
+      if (type == 'Income') {
+        totalIncome += amount;
+      } else if (type == 'Expense') {
+        totalExpense += amount;
+      }
+    }
+
+    final balance = totalIncome - totalExpense;
+
+    return Column(
+      children: [
+        // Display the total expense and income
+        Center(
+          child: Text(
+            "Total Expense: ₹${totalExpense.toStringAsFixed(2)}\nTotal Income: ₹${totalIncome.toStringAsFixed(2)}",
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.white),
+          ),
+        ),]);
+   } ),
                     Padding(
                       padding: const EdgeInsets.only(top: 40.0, left: 100),
                       child: SizedBox(
@@ -209,98 +240,151 @@ class HomePage extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 // Budget Warnings
-                Card(
-                  elevation: 4,
-                  color: const Color.fromARGB(255, 11, 11, 11),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: [
-                        const Text(
-                          "Budget Warnings",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const Divider(),
-                        const Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                "Category",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                "Budget",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                "Status",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Divider(),
-                        SizedBox(
-                          height: 150,
-                          child: ListView.builder(
-                            itemCount: 10,
-                            itemBuilder: (context, index) {
-                              return Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      "Category $index",
-                                      style:
-                                          const TextStyle(color: Colors.white),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      "\$${index * 100}",
-                                      style:
-                                          const TextStyle(color: Colors.white),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      index % 2 == 0
-                                          ? "Exceeded"
-                                          : "Within Budget",
-                                      style:
-                                          const TextStyle(color: Colors.white),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
+               FutureBuilder(
+  future: Future.wait([
+    FirebaseFirestore.instance.collection("addBudget").get(),
+    FirebaseFirestore.instance.collection("transactions").get(),
+  ]),
+  builder: (context, AsyncSnapshot<List<QuerySnapshot>> snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (!snapshot.hasData || snapshot.data!.any((doc) => doc.docs.isEmpty)) {
+      return const Center(
+        child: Text(
+          "No budget or transaction data available",
+          style: TextStyle(color: Colors.white),
+        ),
+      );
+    }
+
+    final addBudgetDocs = snapshot.data![0].docs;
+    final transactionsDocs = snapshot.data![1].docs;
+
+    // Prepare data for comparison
+    final categoryStatus = <String, Map<String, dynamic>>{};
+
+    // Add budgets to the map
+    for (var doc in addBudgetDocs) {
+      final data = doc.data() as Map<String, dynamic>;
+      final category = data['Category'] ?? 'Unknown';
+      final budget = data['Budget'] ?? 0;
+
+      categoryStatus[category] = {
+        'budget': budget,
+        'totalExpense': 0,
+        'status': 'Within Budget',
+      };
+    }
+
+    // Calculate expenses
+    for (var doc in transactionsDocs) {
+      final data = doc.data() as Map<String, dynamic>;
+      final category = data['Category'] ?? 'Unknown';
+      final amount = data['Amount'] ?? 0;
+
+      if (categoryStatus.containsKey(category)) {
+        categoryStatus[category]!['totalExpense'] += amount;
+      }
+    }
+
+    // Determine status
+    categoryStatus.forEach((key, value) {
+      if (value['totalExpense'] > value['budget']) {
+        value['status'] = 'Budget Exceeded';
+      }
+    });
+
+    // Return the Card with the list of categories
+    return Card(
+      elevation: 4,
+      color: const Color.fromARGB(255, 11, 11, 11),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            const Text(
+              "Budget Warnings",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            const Divider(),
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    "Category",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white),
+                    textAlign: TextAlign.center,
                   ),
                 ),
+                Expanded(
+                  child: Text(
+                    "Budget",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    "Status",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
+            const Divider(),
+            SizedBox(
+              height: 150,
+              child: ListView.builder(
+                itemCount: categoryStatus.keys.length,
+                itemBuilder: (context, index) {
+                  final category = categoryStatus.keys.elementAt(index);
+                  final budget = categoryStatus[category]!['budget'];
+                  final status = categoryStatus[category]!['status'];
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          category,
+                          style: const TextStyle(color: Colors.white),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          "\$$budget",
+                          style: const TextStyle(color: Colors.white),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          status,
+                          style: const TextStyle(color: Colors.white),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  },
+),
+
                 const SizedBox(height: 20),
                 // Recent Transactions
               // Add this package for date formatting

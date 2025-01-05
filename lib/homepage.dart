@@ -8,7 +8,6 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
  import 'package:intl/intl.dart'; 
 
-
 class HomePageWithNavbar extends StatefulWidget {
   const HomePageWithNavbar({super.key});
 
@@ -55,7 +54,27 @@ class _HomePageWithNavbarState extends State<HomePageWithNavbar> {
     );
   }
 }
- 
+ Color _getCategoryColor(String category) {
+    switch (category) {
+      case 'Food':
+        return Colors.blue;
+      case 'Transport':
+        return Colors.green;
+      case 'Entertainment':
+        return Colors.red;
+      case 'Shopping':
+        return const Color.fromARGB(233, 222, 244, 54);
+      case 'Health':
+        return const Color.fromARGB(255, 54, 244, 241);
+      case 'Bills':
+        return const Color.fromARGB(255, 244, 54, 187);
+      case 'Studies':
+        return const Color.fromARGB(255, 139, 54, 244);
+      case 'Others':
+        return const Color.fromARGB(255, 244, 162, 54);     
+      default:
+        return Colors.grey;
+    }}
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -90,153 +109,248 @@ class HomePage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Charts
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    SizedBox(
-                      width: 500,
-                      height: 300,
-                      child: PieChart(
-                        PieChartData(
-                          sections: [
-                            PieChartSectionData(
-                              color: Colors.blue,
-                              value: 40,
-                              title: '40%',
+                SingleChildScrollView(
+        scrollDirection: Axis.vertical, // Enable vertical scrolling
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal, // Enable horizontal scrolling
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minWidth: MediaQuery.of(context).size.width,
+              ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                        FutureBuilder<QuerySnapshot>(
+                        future: FirebaseFirestore.instance.collection("transactions").get(),
+                        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(child: CircularProgressIndicator());
+                          }
+                  
+                          if (snapshot.hasError) {
+                            return Center(child: Text("Error: ${snapshot.error}"));
+                          }
+                  
+                          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                            return const Center(child: Text("No transactions available."));
+                          }
+                  
+                          // Process data
+                          final transactions = snapshot.data!.docs;
+                          double totalIncome = 0;
+                          Map<String, double> expensesByCategory = {};
+                  
+                          for (var transaction in transactions) {
+                            final data = transaction.data() as Map<String, dynamic>;
+                            final category = data['Category'] as String;
+                            final amount = (data['Amount'] as num).toDouble();
+                            final type = data['Transaction Type'] as String; // Assume 'type' is 'income' or 'expense'
+                  
+                            if (type == 'Income') {
+                              totalIncome += amount;
+                            } else if (type == 'Expense') {
+                              expensesByCategory[category] = (expensesByCategory[category] ?? 0) + amount;
+                            }
+                          }
+                  
+                          // Calculate percentages
+                          final pieChartData = expensesByCategory.entries
+                              .map((entry) => PieChartSectionData(
+                    color: _getCategoryColor(entry.key),
+                    value: (entry.value / totalIncome) * 100,
+                    title: '${(entry.value / totalIncome * 100).toStringAsFixed(1)}%',
+                  ))
+                              .toList();
+                  
+                          return SizedBox(
+                            width: 500,
+                            height: 300,
+                            child: PieChart(
+                              PieChartData(sections: pieChartData),
                             ),
-                            PieChartSectionData(
-                              color: Colors.green,
-                              value: 30,
-                              title: '30%',
-                            ),
-                            PieChartSectionData(
-                              color: Colors.red,
-                              value: 30,
-                              title: '30%',
-                            ),
-                          ],
-                        ),
+                          );
+                        },
                       ),
-                    ),
-                   FutureBuilder<QuerySnapshot>(
-  future: FirebaseFirestore.instance.collection("transactions").get(),
-  builder: (context, snapshot) {
+                    
+                  
+                    
+                     FutureBuilder<QuerySnapshot>(
+                    future: FirebaseFirestore.instance.collection("transactions").get(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                        return const Center(
+                          child: Text(
+                            'No transactions available',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        );
+                      }
+                  
+                      final transactions = snapshot.data!.docs;
+                      double totalIncome = 0;
+                      double totalExpense = 0;
+                  
+                      for (var doc in transactions) {
+                        final data = doc.data() as Map<String, dynamic>;
+                        final amount = data['Amount'] ?? 0;
+                        final type = data['Transaction Type'] ?? '';
+                  
+                        if (type == 'Income') {
+                          totalIncome += amount;
+                        } else if (type == 'Expense') {
+                          totalExpense += amount;
+                        }
+                      }
+                  
+                    //  final balance = totalIncome - totalExpense;
+                  
+                      return Column(
+                        children: [
+                          // Display the total expense and income
+                          Center(
+                            child: Text(
+                              "Total Expense: ₹${totalExpense.toStringAsFixed(2)}\nTotal Income: ₹${totalIncome.toStringAsFixed(2)}",
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.white),
+                            ),
+                          ),]);
+                     } ),
+                      FutureBuilder(
+  future: Future.wait([
+    FirebaseFirestore.instance.collection("addBudget").get(),
+    FirebaseFirestore.instance.collection("transactions").get(),
+  ]),
+  builder: (context, AsyncSnapshot<List<QuerySnapshot>> snapshot) {
     if (snapshot.connectionState == ConnectionState.waiting) {
       return const Center(child: CircularProgressIndicator());
     }
-    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+    if (!snapshot.hasData || snapshot.data!.any((doc) => doc.docs.isEmpty)) {
       return const Center(
         child: Text(
-          'No transactions available',
+          "No budget or transaction data available",
           style: TextStyle(color: Colors.white),
         ),
       );
     }
 
-    final transactions = snapshot.data!.docs;
-    double totalIncome = 0;
-    double totalExpense = 0;
+    final addBudgetDocs = snapshot.data![0].docs;
+    final transactionsDocs = snapshot.data![1].docs;
 
-    for (var doc in transactions) {
+    // Prepare data for comparison
+    final categoryStatus = <String, Map<String, dynamic>>{};
+
+    // Add budgets to the map
+    for (var doc in addBudgetDocs) {
       final data = doc.data() as Map<String, dynamic>;
-      final amount = data['Amount'] ?? 0;
-      final type = data['Transaction Type'] ?? '';
+      final category = data['Category'] ?? 'Unknown';
+      final budget = (data['Budget'] as num).toDouble();
 
-      if (type == 'Income') {
-        totalIncome += amount;
-      } else if (type == 'Expense') {
-        totalExpense += amount;
+      categoryStatus[category] = {
+        'budget': budget,
+        'totalExpense': 0.0,
+      };
+    }
+
+    // Add transactions to calculate total expenses per category
+    for (var doc in transactionsDocs) {
+      final data = doc.data() as Map<String, dynamic>;
+      final category = data['Category'] ?? 'Unknown';
+      final type = data['Transaction Type'] ?? '';
+      final amount = (data['Amount'] as num).toDouble();
+
+      if (type == 'Expense') {
+        categoryStatus[category] ??= {'budget': 0.0, 'totalExpense': 0.0};
+        categoryStatus[category]!['totalExpense'] += amount;
       }
     }
 
-    final balance = totalIncome - totalExpense;
+    // Filter categories that exceeded their budget
+    final exceededCategories = categoryStatus.entries
+        .where((entry) =>
+            entry.value['totalExpense'] > entry.value['budget'])
+        .toList();
 
-    return Column(
-      children: [
-        // Display the total expense and income
-        Center(
-          child: Text(
-            "Total Expense: ₹${totalExpense.toStringAsFixed(2)}\nTotal Income: ₹${totalIncome.toStringAsFixed(2)}",
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.white),
+    if (exceededCategories.isEmpty) {
+      return const Center(
+        child: Text(
+          "No categories exceeded their budget.",
+          style: TextStyle(color: Colors.white),
+        ),
+      );
+    }
+
+    // Prepare bar chart data
+    final barGroups = exceededCategories.map((entry) {
+      final category = entry.key;
+      final totalExpense = entry.value['totalExpense'] as double;
+      final budget = entry.value['budget'] as double;
+
+      return BarChartGroupData(x: category.hashCode, barRods: [
+        BarChartRodData(
+          toY: totalExpense,
+          color:_getCategoryColor(category), // Set bar color based on category
+
+          width: 15,
+          borderRadius: BorderRadius.zero,
+        ),
+        BarChartRodData(
+          toY: budget,
+          color: const Color.fromARGB(224, 99, 93, 93), // Show the budget as a reference
+          width: 15,
+          borderRadius: BorderRadius.zero,
+        ),
+      ]);
+    }).toList();
+
+    return SizedBox(
+      width: 500,
+      height: 300,
+      child: BarChart(
+        BarChartData(
+          barGroups: barGroups,
+          titlesData: FlTitlesData(
+            
+            bottomTitles: AxisTitles(
+             // axisNameWidget: const Text('Category'),
+              sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: (value, meta) {
+                  final category = exceededCategories
+                      .firstWhere((entry) => entry.key.hashCode == value.toInt())
+                      .key;
+                  return Text(
+                    category,
+                    style: const TextStyle(color: Colors.white),
+                  );
+                },
+              ),
+            ),
           ),
-        ),]);
-   } ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 40.0, left: 100),
-                      child: SizedBox(
-                        width: 500,
-                        height: 300,
-                        child: BarChart(
-                          BarChartData(
-                            barGroups: [
-                              BarChartGroupData(x: 1, barRods: [
-                                BarChartRodData(
-                                  toY: 10,
-                                  color: Colors.blue,
-                                  width: 15,
-                                  borderRadius: BorderRadius.zero,
-                                ),
-                              ]), 
-                              BarChartGroupData(x: 2, barRods: [
-                                BarChartRodData(
-                                  toY: 12,
-                                  color: Colors.green,
-                                  width: 15,
-                                  borderRadius: BorderRadius.zero,
-                                ),
-                              ]),
-                              BarChartGroupData(x: 3, barRods: [
-                                BarChartRodData(
-                                  toY: 15,
-                                  color: Colors.red,
-                                  width: 15,
-                                  borderRadius: BorderRadius.zero,
-                                ),
-                              ]),
-                            ],
-                            titlesData: FlTitlesData(
-                              leftTitles: AxisTitles(
-                                axisNameWidget: const Text(''),
-                                sideTitles: SideTitles(
-                                  showTitles: true,
-                                  getTitlesWidget: (value, meta) {
-                                    return Text(
-                                      value.toString(),
-                                      style: const TextStyle(color: Colors.white),
-                                    );
-                                  },
-                                ),
-                              ),
-                              bottomTitles: AxisTitles(
-                                axisNameWidget: const Text(''),
-                                sideTitles: SideTitles(
-                                  showTitles: true,
-                                  getTitlesWidget: (value, meta) {
-                                    return Text(
-                                      value.toString(),
-                                      style: const TextStyle(color: Colors.white),
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
-                            gridData: FlGridData(
-                              show: true,
-                              getDrawingHorizontalLine: (value) => const FlLine(
-                                  color: Colors.white,
-                                  strokeWidth: 0.5),
-                              getDrawingVerticalLine: (value) => const FlLine(
-                                  color: Colors.white,
-                                  strokeWidth: 0.5),
-                            ),
-                            borderData: FlBorderData(show: false),
-                          ),
-                        ),
-                      ),
-                    ),
+          gridData: FlGridData(
+            show: true,
+            getDrawingHorizontalLine: (value) => const FlLine(
+              color: Colors.white,
+              strokeWidth: 0.5,
+            ),
+          ),
+          borderData: FlBorderData(show: false),
+        ),
+      ),
+    );
+  },
+),
 
-                  ],
+                  
+                    ],
+                  )
+            )
+          )
+                  ),
                 ),
                 const SizedBox(height: 20),
                 // Budget Warnings
@@ -499,7 +613,6 @@ FutureBuilder(
 ),
 
 
-
               ],
             ),
           ),
@@ -508,3 +621,4 @@ FutureBuilder(
     );
   }
 }
+

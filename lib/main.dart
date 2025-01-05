@@ -79,16 +79,16 @@ class _MyHomePageState extends State<MyHomePage> {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       // Sign Up button
-      ElevatedButton(
-        onPressed: () {
-          // Add Sign Up functionality here
-        },
-        style: ElevatedButton.styleFrom(
-          foregroundColor: Colors.white, backgroundColor: Colors.black, minimumSize: const Size(200, 60), // White text
-          side: const BorderSide(color: Colors.white), // White border
-        ),
-        child: const Text('Sign Up'),
-      ),
+      // ElevatedButton(
+      //   onPressed: () {
+      //     // Add Sign Up functionality here
+      //   },
+      //   style: ElevatedButton.styleFrom(
+      //     foregroundColor: Colors.white, backgroundColor: Colors.black, minimumSize: const Size(200, 60), // White text
+      //     side: const BorderSide(color: Colors.white), // White border
+      //   ),
+      //   child: const Text('Sign Up'),
+      // ),
       const SizedBox(height: 30),
       // Continue button
       ElevatedButton(

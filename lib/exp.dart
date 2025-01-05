@@ -105,178 +105,181 @@ class ExpenseTrackerScreenState extends State<ExpenseTrackerScreen> {
           ),
         ],
       ),
-      body: Container(
-        color: Colors.black,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Center(
-                child: Text(
-                  'Enter the Transaction',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+      backgroundColor: Colors.black,
+    body: SingleChildScrollView(
+      child: Container(
+          color: Colors.black,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Center(
+                  child: Text(
+                    'Enter the Transaction',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    'Expense',
-                    style: TextStyle(color: Colors.white, fontSize: 18),
-                  ),
-                  Switch(
-                    value: isIncome,
-                    onChanged: (bool value) {
-                      setState(() {
-                        isIncome = value;
-                      });
-                    },
-                  ),
-                  const Text(
-                    'Income',
-                    style: TextStyle(color: Colors.white, fontSize: 18),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 30),
-              TextField(
-                controller: amountController,
-                keyboardType: TextInputType.number,
-                style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(
-                  labelText: 'Enter Amount',
-                  labelStyle: TextStyle(color: Colors.white),
-                  hintStyle: TextStyle(color: Colors.white),
-                  border: OutlineInputBorder(),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Expense',
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    ),
+                    Switch(
+                      value: isIncome,
+                      onChanged: (bool value) {
+                        setState(() {
+                          isIncome = value;
+                        });
+                      },
+                    ),
+                    const Text(
+                      'Income',
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 30),
+                TextField(
+                  controller: amountController,
+                  keyboardType: TextInputType.number,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: const InputDecoration(
+                    labelText: 'Enter Amount',
+                    labelStyle: TextStyle(color: Colors.white),
+                    hintStyle: TextStyle(color: Colors.white),
+                    border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: dateController,
-                style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  labelText: 'Date',
-                  labelStyle: const TextStyle(color: Colors.white),
-                  hintStyle: const TextStyle(color: Colors.white),
-                  border: const OutlineInputBorder(),
-                  focusedBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: dateController,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: 'Date',
+                    labelStyle: const TextStyle(color: Colors.white),
+                    hintStyle: const TextStyle(color: Colors.white),
+                    border: const OutlineInputBorder(),
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.calendar_today),
+                      color: Colors.white,
+                      onPressed: () => _selectDate(context),
+                    ),
                   ),
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.calendar_today),
-                    color: Colors.white,
-                    onPressed: () => _selectDate(context),
+                  readOnly: true,
+                  onTap: () => _selectDate(context),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: timeController,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: 'Time',
+                    labelStyle: const TextStyle(color: Colors.white),
+                    hintStyle: const TextStyle(color: Colors.white),
+                    border: const OutlineInputBorder(),
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.access_time),
+                      color: Colors.white,
+                      onPressed: () => _selectTime(context),
+                    ),
+                  ),
+                  readOnly: true,
+                  onTap: () => _selectTime(context),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                   controller: detailsController,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: const InputDecoration(
+                    labelText: 'Transaction Details',
+                    labelStyle: TextStyle(color: Colors.white),
+                    hintStyle: TextStyle(color: Colors.white),
+                    border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
                   ),
                 ),
-                readOnly: true,
-                onTap: () => _selectDate(context),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: timeController,
-                style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  labelText: 'Time',
-                  labelStyle: const TextStyle(color: Colors.white),
-                  hintStyle: const TextStyle(color: Colors.white),
-                  border: const OutlineInputBorder(),
-                  focusedBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
-                  ),
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.access_time),
-                    color: Colors.white,
-                    onPressed: () => _selectTime(context),
-                  ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    const SizedBox(width: 8),
+                    DropdownButton<IconLabel>(
+                      value: selectedCategory,
+                      hint: const Text(
+                        'Select Category',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      items: IconLabel.entries
+                          .map(
+                            (entry) => DropdownMenuItem<IconLabel>(
+                              value: entry.value,
+                              child: Row(
+                                children: [
+                                  Icon(entry.value.icon, color: Colors.white),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    entry.value.label,
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (IconLabel? category) {
+                        setState(() {
+                          selectedCategory = category;
+                        });
+                      },
+                      dropdownColor: Colors.black,
+                    ),
+                  ],
                 ),
-                readOnly: true,
-                onTap: () => _selectTime(context),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                 controller: detailsController,
-                style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(
-                  labelText: 'Transaction Details',
-                  labelStyle: TextStyle(color: Colors.white),
-                  hintStyle: TextStyle(color: Colors.white),
-                  border: OutlineInputBorder(),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                const SizedBox(height: 16),
+                if (selectedCategory != null)
+                  Text(
+                    'Selected Category: ${selectedCategory?.label}',
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
                   ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  const SizedBox(width: 8),
-                  DropdownButton<IconLabel>(
-                    value: selectedCategory,
-                    hint: const Text(
-                      'Select Category',
+                const SizedBox(height: 30),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: () async{ await addExpense();},
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 37, 37, 37),
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                      textStyle: const TextStyle(fontSize: 18),
+                    ),
+                    child: const Text(
+                      'Add the Transaction',
                       style: TextStyle(color: Colors.white),
                     ),
-                    items: IconLabel.entries
-                        .map(
-                          (entry) => DropdownMenuItem<IconLabel>(
-                            value: entry.value,
-                            child: Row(
-                              children: [
-                                Icon(entry.value.icon, color: Colors.white),
-                                const SizedBox(width: 10),
-                                Text(
-                                  entry.value.label,
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                              ],
-                            ),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (IconLabel? category) {
-                      setState(() {
-                        selectedCategory = category;
-                      });
-                    },
-                    dropdownColor: Colors.black,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              if (selectedCategory != null)
-                Text(
-                  'Selected Category: ${selectedCategory?.label}',
-                  style: const TextStyle(color: Colors.white, fontSize: 16),
-                ),
-              const SizedBox(height: 30),
-              Center(
-                child: ElevatedButton(
-                  onPressed: () async{ await addExpense();},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 37, 37, 37),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                    textStyle: const TextStyle(fontSize: 18),
-                  ),
-                  child: const Text(
-                    'Add the Transaction',
-                    style: TextStyle(color: Colors.white),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
+    ),
     );
   }
 }

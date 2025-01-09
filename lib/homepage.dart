@@ -73,7 +73,7 @@ class _HomePageWithNavbarState extends State<HomePageWithNavbar> {
       case 'Others':
         return const Color.fromARGB(255, 244, 162, 54);     
       default:
-        return Colors.grey;
+        return const Color.fromARGB(255, 111, 78, 78);
     }}
 
 class HomePage extends StatelessWidget {
@@ -123,56 +123,70 @@ class HomePage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                         FutureBuilder<QuerySnapshot>(
-                        future: FirebaseFirestore.instance.collection("transactions").get(),
-                        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return const Center(child: CircularProgressIndicator());
-                          }
-                  
-                          if (snapshot.hasError) {
-                            return Center(child: Text("Error: ${snapshot.error}"));
-                          }
-                  
-                          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                            return const Center(child: Text("No transactions available."));
-                          }
-                  
-                          // Process data
-                          final transactions = snapshot.data!.docs;
-                          double totalIncome = 0;
-                          Map<String, double> expensesByCategory = {};
-                  
-                          for (var transaction in transactions) {
-                            final data = transaction.data() as Map<String, dynamic>;
-                            final category = data['Category'] as String;
-                            final amount = (data['Amount'] as num).toDouble();
-                            final type = data['Transaction Type'] as String; // Assume 'type' is 'income' or 'expense'
-                  
-                            if (type == 'Income') {
-                              totalIncome += amount;
-                            } else if (type == 'Expense') {
-                              expensesByCategory[category] = (expensesByCategory[category] ?? 0) + amount;
-                            }
-                          }
-                  
-                          // Calculate percentages
-                          final pieChartData = expensesByCategory.entries
-                              .map((entry) => PieChartSectionData(
-                    color: _getCategoryColor(entry.key),
-                    value: (entry.value / totalIncome) * 100,
-                    title: '${(entry.value / totalIncome * 100).toStringAsFixed(1)}%',
-                  ))
-                              .toList();
-                  
-                          return SizedBox(
-                            width: 500,
-                            height: 300,
-                            child: PieChart(
-                              PieChartData(sections: pieChartData),
-                            ),
-                          );
-                        },
-                      ),
+  future: FirebaseFirestore.instance.collection("transactions").get(),
+  builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (snapshot.hasError) {
+      return Center(child: Text("Error: ${snapshot.error}"));
+    }
+
+    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+      return const Center(child: Text("No transactions available."));
+    }
+
+    final now = DateTime.now();
+    final currentMonth = DateFormat('yyyy-MM').format(now);
+
+    // Filter transactions for the current month
+    final transactions = snapshot.data!.docs.where((doc) {
+      final data = doc.data() as Map<String, dynamic>;
+      final date = data['Date'] as String?; // Ensure your Firestore has a 'Date' field
+      return date != null && date.startsWith(currentMonth);
+    }).toList();
+
+    if (transactions.isEmpty) {
+      return const Center(child: Text("No transactions for the current month."));
+    }
+
+    double totalIncome = 0;
+    Map<String, double> expensesByCategory = {};
+
+    for (var transaction in transactions) {
+      final data = transaction.data() as Map<String, dynamic>;
+      final category = data['Category'] as String;
+      final amount = (data['Amount'] as num).toDouble();
+      final type = data['Transaction Type'] as String;
+
+      if (type == 'Income') {
+        totalIncome += amount;
+      } else if (type == 'Expense') {
+        expensesByCategory[category] = (expensesByCategory[category] ?? 0) + amount;
+      }
+    }
+
+    // Generate pie chart data
+    final pieChartData = expensesByCategory.entries.map((entry) {
+      final percentage = (entry.value / totalIncome) * 100;
+      return PieChartSectionData(
+        color: _getCategoryColor(entry.key),
+        value: percentage,
+        title: '${percentage.toStringAsFixed(1)}%',
+      );
+    }).toList();
+
+    return SizedBox(
+      width: 500,
+      height: 300,
+      child: PieChart(
+        PieChartData(sections: pieChartData),
+      ),
+    );
+  },
+),
+
                     
                   
                     
@@ -210,17 +224,87 @@ class HomePage extends StatelessWidget {
                     //  final balance = totalIncome - totalExpense;
                   
                       return Column(
-                        children: [
-                          // Display the total expense and income
-                          Center(
-                            child: Text(
-                              "Total Expense: ₹${totalExpense.toStringAsFixed(2)}\nTotal Income: ₹${totalIncome.toStringAsFixed(2)}",
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.white),
-                            ),
-                          ),]);
+  children: [
+    // Display the total expense and income
+    Center(
+      child: Text(
+        "Total Expense: ₹${totalExpense.toStringAsFixed(2)}\nTotal Income: ₹${totalIncome.toStringAsFixed(2)}",
+        textAlign: TextAlign.center,
+        style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.white),
+      ),
+    ),
+
+    // Add color icons and color names in a row
+    const Padding(
+      padding: EdgeInsets.symmetric(vertical: 16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Display the color icons with their labels in the same row
+          Column(
+            children: [
+              Icon(Icons.square, color: Colors.blue, size: 20),
+              Text("Food", style: TextStyle(color: Colors.blue)),
+            ],
+          ),
+          SizedBox(width: 8),
+          Column(
+            children: [
+              Icon(Icons.square, color: Colors.green, size: 20),
+              Text("Transport", style: TextStyle(color: Colors.green)),
+            ],
+          ),
+          SizedBox(width: 8),
+          Column(
+            children: [
+              Icon(Icons.square, color: Colors.red, size: 20),
+              Text("Entertainment", style: TextStyle(color: Colors.red)),
+            ],
+          ),
+          SizedBox(width: 8),
+          Column(
+            children: [
+              Icon(Icons.square, color: Colors.yellow, size: 20),
+              Text("Shopping", style: TextStyle(color: Colors.yellow)),
+            ],
+          ),
+          SizedBox(width: 8),
+          Column(
+            children: [
+              Icon(Icons.square, color: Colors.cyan, size: 20),
+              Text("Health", style: TextStyle(color: Colors.cyan)),
+            ],
+          ),
+          SizedBox(width: 8),
+          Column(
+            children: [
+              Icon(Icons.square, color: Colors.pink, size: 20),
+              Text("Bills", style: TextStyle(color: Colors.pink)),
+            ],
+          ),
+          SizedBox(width: 8),
+          Column(
+            children: [
+              Icon(Icons.square, color: Colors.purple, size: 20),
+              Text("Studies", style: TextStyle(color: Colors.purple)),
+            ],
+          ),
+          SizedBox(width: 8),
+          Column(
+            children: [
+              Icon(Icons.square, color: Colors.orange, size: 20),
+              Text("Others", style: TextStyle(color: Colors.orange)),
+            ],
+          ),
+        ],
+      ),
+    ),
+  ],
+);
+
                      } ),
-                      FutureBuilder(
+                     
+                     FutureBuilder(
   future: Future.wait([
     FirebaseFirestore.instance.collection("addBudget").get(),
     FirebaseFirestore.instance.collection("transactions").get(),
@@ -242,6 +326,8 @@ class HomePage extends StatelessWidget {
     final transactionsDocs = snapshot.data![1].docs;
 
     // Prepare data for comparison
+    final now = DateTime.now();
+    final currentMonth = DateFormat('yyyy-MM').format(now);
     final categoryStatus = <String, Map<String, dynamic>>{};
 
     // Add budgets to the map
@@ -262,8 +348,9 @@ class HomePage extends StatelessWidget {
       final category = data['Category'] ?? 'Unknown';
       final type = data['Transaction Type'] ?? '';
       final amount = (data['Amount'] as num).toDouble();
+      final date = data['Date'] as String?; // Ensure 'Date' field exists and is in correct format
 
-      if (type == 'Expense') {
+      if (type == 'Expense' && date != null && date.startsWith(currentMonth)) {
         categoryStatus[category] ??= {'budget': 0.0, 'totalExpense': 0.0};
         categoryStatus[category]!['totalExpense'] += amount;
       }
@@ -278,7 +365,7 @@ class HomePage extends StatelessWidget {
     if (exceededCategories.isEmpty) {
       return const Center(
         child: Text(
-          "No categories exceeded their budget.",
+          "No categories exceeded their budget this month.",
           style: TextStyle(color: Colors.white),
         ),
       );
@@ -300,7 +387,7 @@ class HomePage extends StatelessWidget {
         ),
         BarChartRodData(
           toY: budget,
-          color: const Color.fromARGB(224, 99, 93, 93), // Show the budget as a reference
+          color: const Color.fromARGB(223, 191, 190, 190), // Show the budget as a reference
           width: 15,
           borderRadius: BorderRadius.zero,
         ),
@@ -309,7 +396,7 @@ class HomePage extends StatelessWidget {
 
     return SizedBox(
       width: 500,
-      height: 300,
+      height: 250,
       child: BarChart(
         BarChartData(
           barGroups: barGroups,
@@ -375,6 +462,11 @@ class HomePage extends StatelessWidget {
     final addBudgetDocs = snapshot.data![0].docs;
     final transactionsDocs = snapshot.data![1].docs;
 
+    // Get the current month and year
+    final now = DateTime.now();
+    final currentMonth = now.month;
+    final currentYear = now.year;
+
     // Prepare data for comparison
     final categoryStatus = <String, Map<String, dynamic>>{};
 
@@ -391,14 +483,22 @@ class HomePage extends StatelessWidget {
       };
     }
 
-    // Calculate expenses
+    // Calculate current month's expenses
     for (var doc in transactionsDocs) {
       final data = doc.data() as Map<String, dynamic>;
       final category = data['Category'] ?? 'Unknown';
       final amount = data['Amount'] ?? 0;
+      final dateStr = data['Date'] ?? '';
 
-      if (categoryStatus.containsKey(category)) {
-        categoryStatus[category]!['totalExpense'] += amount;
+      try {
+        final date = DateTime.parse(dateStr);
+        if (date.month == currentMonth && date.year == currentYear) {
+          if (categoryStatus.containsKey(category)) {
+            categoryStatus[category]!['totalExpense'] += amount;
+          }
+        }
+      } catch (e) {
+        print("Invalid date format: $dateStr");
       }
     }
 
@@ -418,7 +518,7 @@ class HomePage extends StatelessWidget {
         child: Column(
           children: [
             const Text(
-              "Budget Warnings",
+              "Budget Warnings (Current Month)",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
@@ -498,6 +598,7 @@ class HomePage extends StatelessWidget {
     );
   },
 ),
+
 
                 const SizedBox(height: 20),
                 // Recent Transactions

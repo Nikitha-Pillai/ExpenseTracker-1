@@ -14,15 +14,7 @@ class MyPage extends StatelessWidget {
           style: TextStyle(color: Colors.white),
         ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 50.0),
-            child: IconButton(
-              icon: const Icon(Icons.person, color: Colors.black),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ),
+          
         ],
       ),
       backgroundColor: Colors.black,

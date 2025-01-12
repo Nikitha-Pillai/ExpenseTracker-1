@@ -93,16 +93,7 @@ class ExpenseTrackerScreenState extends State<ExpenseTrackerScreen> {
           style: TextStyle(color: Colors.white),
         ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 50.0),
-            child: IconButton(
-              icon: const Icon(Icons.person, color: Colors.black),
-              onPressed: () {
-                Navigator.push(
-                    context, MaterialPageRoute(builder: (context) => const MyApp()));
-              },
-            ),
-          ),
+         
         ],
       ),
       backgroundColor: Colors.black,

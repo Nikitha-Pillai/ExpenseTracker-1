@@ -1,9 +1,10 @@
+import 'dart:async';
 import 'package:expense_tracker_1/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:expense_tracker_1/homepage.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
@@ -16,109 +17,114 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       title: 'Expense Tracker',
-      home: MyHomePage(title: 'Flutter Demo Homepage'),
+      home: MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+  const MyHomePage({super.key});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final List<String> _imagePaths = [
+    'assets/images/1.png',
+    'assets/images/3.png',
+    'assets/images/4.png',
+    'assets/images/1.png',
+    
+  ];
+
+  final PageController _pageController = PageController(initialPage: 0);
+  int _currentIndex = 0;
+  late Timer _timer;
+
+
+  @override
+  void initState() {
+    super.initState();
+    _startImageSlide();
+  }
+
+  void _startImageSlide() {
+    _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      if (_currentIndex < _imagePaths.length - 1) {
+        setState(() {
+          _currentIndex++;
+          _pageController.animateToPage(
+            _currentIndex,
+            duration: const Duration(milliseconds: 800),
+            curve: Curves.easeInOut,
+          );
+        });
+      } else {
+        setState(() {
+        });
+        _timer.cancel(); // Stop the timer when the animation ends
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    _pageController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 79, 78, 78),
-        title: const Text('Expense Tracker',style: TextStyle(color: Colors.white),),
-       
-      ),
-      body: Container(
-        color: Colors.black,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Heading below AppBar
-              const Center(
-                child: Text(
-                  'Track Your Expense Now',
-                  style:  TextStyle(color: Colors.white,fontSize: 24)
+      backgroundColor: Colors.black,
+      body: Center(
+      child: Container(
+        width: 1500,
+        height: 700,
+        color: const Color.fromARGB(255, 0, 0, 0), // Simple background color
+        child: Stack(
+          children: [
+            PageView.builder(
+              controller: _pageController,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: _imagePaths.length,
+              itemBuilder: (context, index) {
+                return Image.asset(
+                  _imagePaths[index],
+                  fit: BoxFit.fill,
+                );
+              },
+            ),
+            Positioned(
+              bottom: 28, // Adjust this value to bring the button further down
+              left: 0,
+              right: 0,
+              child: Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const HomePageWithNavbar(),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: const Color.fromARGB(255, 0, 0, 0),
+                    backgroundColor: const Color.fromARGB(255, 46, 193, 198),
+                    minimumSize: const Size(150, 50),
+                    side: const BorderSide(color: Colors.white),
+                  ),
+                  child: const Text('Track Now'),
                 ),
               ),
-              const SizedBox(height: 50),
-        
-              // Row to show the card with image and buttons on the right
-            Row(
-          mainAxisAlignment: MainAxisAlignment.start, // Align items to the start
-          children: [
-            // Left side: Card with image
-            Padding(
-        padding: const EdgeInsets.only(left: 250.0), // Add padding to push the card to the right
-        child: Card(
-          elevation: 4,
-          child: SizedBox(
-            width: 500,
-            height: 500,
-            child: Image.asset('assets/images/chart.png', fit: BoxFit.cover),
-          ),
-        ),
             ),
-        
-            // Right side: Buttons
-          Padding(
-  padding: const EdgeInsets.only(left: 300.0), // Add padding to move buttons to the right
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      // Sign Up button
-      // ElevatedButton(
-      //   onPressed: () {
-      //     // Add Sign Up functionality here
-      //   },
-      //   style: ElevatedButton.styleFrom(
-      //     foregroundColor: Colors.white, backgroundColor: Colors.black, minimumSize: const Size(200, 60), // White text
-      //     side: const BorderSide(color: Colors.white), // White border
-      //   ),
-      //   child: const Text('Sign Up'),
-      // ),
-      const SizedBox(height: 30),
-      // Continue button
-      ElevatedButton(
-        onPressed: () {
-          // Navigate to ExpenseTrackerApp page
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const HomePageWithNavbar(),
-            ),
-          );
-        },
-        style: ElevatedButton.styleFrom(
-          foregroundColor: Colors.white, backgroundColor: Colors.black, minimumSize: const Size(200, 60), // White text
-          side: const BorderSide(color: Colors.white), // White border
-        ),
-        child: const Text('Continue'),
-      ),
-    ],
-  ),
-)
-
-        
           ],
         ),
-        
-            ],
-          ),
-        ),
       ),
+    ),
     );
   }
 }

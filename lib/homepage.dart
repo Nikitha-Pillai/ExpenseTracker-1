@@ -88,17 +88,7 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 79, 78, 78),
         title: const Text('Expense Tracker',style: TextStyle(color: Colors.white),),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 50.0),
-            child: IconButton(
-              icon: const Icon(Icons.person, color: Colors.black),
-              onPressed: () { Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => const MyApp()));
-                },
-            ),
-          ),
-        ],
+        actions: [],
       ),
       body: Container(
         color: Colors.black,
@@ -227,18 +217,24 @@ class HomePage extends StatelessWidget {
   children: [
     // Display the total expense and income
     Center(
-      child: Text(
-        "Total Expense: ₹${totalExpense.toStringAsFixed(2)}\nTotal Income: ₹${totalIncome.toStringAsFixed(2)}",
-        textAlign: TextAlign.center,
-        style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.white),
-      ),
+  child: Padding(
+    padding: const EdgeInsets.only(right: 105.0), // Adjust the left padding
+    child: Text(
+      "Total Expense: ₹${totalExpense.toStringAsFixed(2)}\nTotal Income: ₹${totalIncome.toStringAsFixed(2)}",
+      textAlign: TextAlign.center,
+      style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.white),
     ),
+  ),
+),
 
     // Add color icons and color names in a row
     const Padding(
-      padding: EdgeInsets.symmetric(vertical: 16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      
+       padding: EdgeInsets.symmetric(vertical: 16.0),
+  child: Padding(
+    padding: const EdgeInsets.only(right: 106.0), // Adjust this value to move it to the right
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.start,
         children: [
           // Display the color icons with their labels in the same row
           Column(
@@ -299,6 +295,7 @@ class HomePage extends StatelessWidget {
         ],
       ),
     ),
+    )
   ],
 );
 
@@ -401,10 +398,24 @@ class HomePage extends StatelessWidget {
         BarChartData(
           barGroups: barGroups,
           titlesData: FlTitlesData(
+             leftTitles: AxisTitles(
+      sideTitles: SideTitles(
+        showTitles: true,
+        reservedSize: 40, // Space for y-axis labels
+        getTitlesWidget: (value, meta) {
+          // Render the y-axis numbers in white
+          return Text(
+            '${value.toInt()}',
+            style: const TextStyle(color: Colors.white),
+          );
+        },
+      ),
+             ),
             
             bottomTitles: AxisTitles(
              // axisNameWidget: const Text('Category'),
               sideTitles: SideTitles(
+                
                 showTitles: true,
                 getTitlesWidget: (value, meta) {
                   final category = exceededCategories

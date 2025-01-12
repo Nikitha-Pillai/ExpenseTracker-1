@@ -113,18 +113,7 @@ final Map<String, Color> categoryColors = {
           style: TextStyle(color: Colors.white),
         ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 50.0),
-            child: IconButton(
-              icon: const Icon(Icons.person, color: Colors.black),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const MyApp()),
-                );
-              },
-            ),
-          ),
+          
         ],
       ),
       body: SingleChildScrollView(
